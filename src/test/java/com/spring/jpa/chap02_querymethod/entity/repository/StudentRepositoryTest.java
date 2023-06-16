@@ -1,7 +1,6 @@
-package com.spring.jpa.chap02_querymethod.entity.repository;
+package com.spring.jpa.chap02_querymethod.repository;
 
 import com.spring.jpa.chap02_querymethod.entity.Student;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,13 +11,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @Transactional
 @Rollback(false)
 class StudentRepositoryTest {
+
     @Autowired
-    StudentRepository studentRepository;
+    com.spring.jpa.chap02_querymethod.repository.StudentRepository studentRepository;
 
     @BeforeEach
     void insertData() {
@@ -34,8 +35,8 @@ class StudentRepositoryTest {
                 .build();
         Student s3 = Student.builder()
                 .name("대길이")
-                .city("울산시")
-                .major("화학과")
+                .city("한양도성")
+                .major("체육과")
                 .build();
 
         studentRepository.save(s1);
@@ -52,7 +53,7 @@ class StudentRepositoryTest {
         List<Student> students = studentRepository.findByName(name);
 
         //then
-        Assertions.assertEquals(1, students.size());
+        assertEquals(1, students.size());
 
         System.out.println("students.get(0) = " + students.get(0));
     }
@@ -63,13 +64,14 @@ class StudentRepositoryTest {
         //given
         String city = "부산시";
         String major = "수학교육과";
-
         //when
         List<Student> students = studentRepository.findByCityAndMajor(city, major);
 
         //then
-        Assertions.assertEquals("언년이", students.get(0).getName());
+        assertEquals(1, students.size());
+        assertEquals("언년이", students.get(0).getName());
 
+        System.out.println("students.get(0) = " + students.get(0));
     }
 
     @Test
@@ -77,13 +79,12 @@ class StudentRepositoryTest {
     void testFindByMajorContaining() {
         //given
         String major = "수학";
-
         //when
         List<Student> students = studentRepository.findByMajorContaining(major);
 
         //then
+        assertEquals(2, students.size());
 
-        Assertions.assertEquals(2, students.size());
         System.out.println("\n\n\n");
         students.forEach(System.out::println);
         System.out.println("\n\n\n");
@@ -95,15 +96,16 @@ class StudentRepositoryTest {
     void testNativeSQL() {
         //given
         String name = "대길이";
-
         //when
         Student student = studentRepository.findNameWithSQL(name);
 
         //then
-        Assertions.assertEquals("울산시", student.getCity());
+        assertEquals("한양도성", student.getCity());
+
         System.out.println("\n\n\n");
         System.out.println("student = " + student);
         System.out.println("\n\n\n");
+
     }
 
     @Test
@@ -111,15 +113,16 @@ class StudentRepositoryTest {
     void testFindCityWithJPQL() {
         //given
         String city = "서울시";
-
         //when
         List<Student> students = studentRepository.getByCityWithJPQL(city);
 
         //then
-        Assertions.assertEquals("춘식이", students.get(0).getName());
+        assertEquals("춘식이", students.get(0).getName());
+
         System.out.println("\n\n\n");
         System.out.println("student = " + students.get(0));
         System.out.println("\n\n\n");
+
     }
 
     @Test
@@ -127,12 +130,12 @@ class StudentRepositoryTest {
     void testSearchNameJPQL() {
         //given
         String name = "이";
-
         //when
         List<Student> students = studentRepository.searchByNamesWithJPQL(name);
 
         //then
-        Assertions.assertEquals(3, students.size());
+        assertEquals(3, students.size());
+
         System.out.println("\n\n\n");
         students.forEach(System.out::println);
         System.out.println("\n\n\n");
@@ -149,6 +152,7 @@ class StudentRepositoryTest {
         //then
         List<Student> students = studentRepository.findByName(name);
 
-        Assertions.assertEquals(0, students.size());
+        assertEquals(0, students.size());
     }
 }
+
