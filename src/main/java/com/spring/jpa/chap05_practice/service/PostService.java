@@ -1,6 +1,7 @@
 package com.spring.jpa.chap05_practice.service;
 
 import com.spring.jpa.chap05_practice.dto.PageDTO;
+import com.spring.jpa.chap05_practice.dto.PageResponseDTO;
 import com.spring.jpa.chap05_practice.dto.PostDetailResponseDTO;
 import com.spring.jpa.chap05_practice.dto.PostListResponseDTO;
 import com.spring.jpa.chap05_practice.entity.Post;
@@ -16,37 +17,42 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Transactional     // JPA repository 는 트랜잭션 단위로 동작하기 때문에 작성한다.
+@Transactional // JPA 레파지토리는 트랜잭션 단위로 동작하기 때문에 작성
 public class PostService {
 
     private final PostRepository postRepository;
     private final HashTagRepository hashTagRepository;
 
     public PostListResponseDTO getPosts(PageDTO dto) {
+
         //Pageable 객체 생성
         Pageable pageable = PageRequest.of(
-                dto.getPage() - 1, dto.getSize(),
+                dto.getPage() - 1,
+                dto.getSize(),
                 Sort.by("createDate").descending()
         );
 
-        //데이터베이스에서 게시물 목록 조회
+        // 데이터베이스에서 게시물 목록 조회
         Page<Post> posts = postRepository.findAll(pageable);
 
         // 게시물 정보만 꺼내기
         List<Post> postList = posts.getContent();
 
-        List<PostDetailResponseDTO> postDetailResponseDTOList =
-
-        //DB 에서 조회한 정보(Entity) 를 JSON 형태에 맞는 DTO 로 변환
-        PostListResponseDTO responseDTO = PostListResponseDTO.builder()
-                .count()    //총 게시물 수가 아니라 조회된 게시물 수
-                .pageInfo()
-                .posts()
+        // 엔티티 객체를 DTO 객체로 변환한 결과 리스트
+        List<PostDetailResponseDTO> detailList
+                = postList.stream()
+                        .map(post -> new PostDetailResponseDTO(post))
+                        .collect(Collectors.toList());
+        // DB 에서 조회한 정보(ENTITY)를 JSON 형태에 맞는 DTO 로 변환
+        return PostListResponseDTO.builder()
+                .count(detailList.size()) // 총 게시물 수가 아니라 조회된 게시물 수
+                .pageInfo(new PageResponseDTO(posts))   // 생성자에게 Page 정보가 담긴 객체를 그대로 전달
+                .posts(detailList)
                 .build();
-        return responseDTO;
     }
 }
