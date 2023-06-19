@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @SpringBootTest
-//JPA는, INSERT, UPDATE, DELETE시에 트랜잭션을 기준으로 동작하는 경우가 많음.
+//JPA 는, INSERT, UPDATE, DELETE 시에 트랜잭션을 기준으로 동작하는 경우가 많음.
 //기능을 보장받기 위해 웬만하면 트랜잭션 기능을 함께 사용해야 합니다.
 //나중에 MVC 구조에서 Service 클래스에 아노테이션을 첨부하면 됩니다.
 @Transactional

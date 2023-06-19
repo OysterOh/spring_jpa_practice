@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class StudentRepositoryTest {
 
     @Autowired
-    com.spring.jpa.chap02_querymethod.repository.StudentRepository studentRepository;
+    com.spring.jpa.chap02_querymethod.entity.repository.StudentRepository studentRepository;
 
     @BeforeEach
     void insertData() {

@@ -1,4 +1,4 @@
-package com.spring.jpa.chap02_querymethod.repository;
+package com.spring.jpa.chap02_querymethod.entity.repository;
 
 import com.spring.jpa.chap02_querymethod.entity.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -37,10 +37,9 @@ public interface StudentRepository
     @Query("SELECT st FROM Student st WHERE st.name LIKE %:nm%")
     List<Student> searchByNamesWithJPQL(@Param("nm") String name);
 
-    //JPQL로 수정 삭제 쿼리 쓰기
+    //JPQL 로 수정 삭제 쿼리 쓰기
     @Modifying //조회가 아닌 경우에는 무조건 붙여야 함.
     @Query("DELETE FROM Student s WHERE s.name = ?1")
     void deleteByNameWithJPQL(String name);
 
 }
-
