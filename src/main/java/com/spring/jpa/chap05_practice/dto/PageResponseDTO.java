@@ -23,7 +23,8 @@ public class PageResponseDTO<T> {
     public PageResponseDTO(Page<T> pageData) {
         this.totalCount = (int) pageData.getTotalElements();
         this.currentPage = pageData.getPageable().getPageNumber() + 1;
-        this.endPage = (int) (Math.ceil((double) currentPage / PAGE_COUNT) * PAGE_COUNT);
+        this.endPage
+                = (int) (Math.ceil((double) currentPage / PAGE_COUNT) * PAGE_COUNT);
         this.startPage = endPage - PAGE_COUNT + 1;
 
         int realEnd = pageData.getTotalPages();
