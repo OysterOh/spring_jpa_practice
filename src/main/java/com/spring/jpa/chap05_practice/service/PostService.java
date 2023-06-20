@@ -1,9 +1,6 @@
 package com.spring.jpa.chap05_practice.service;
 
-import com.spring.jpa.chap05_practice.dto.PageDTO;
-import com.spring.jpa.chap05_practice.dto.PageResponseDTO;
-import com.spring.jpa.chap05_practice.dto.PostDetailResponseDTO;
-import com.spring.jpa.chap05_practice.dto.PostListResponseDTO;
+import com.spring.jpa.chap05_practice.dto.*;
 import com.spring.jpa.chap05_practice.entity.Post;
 import com.spring.jpa.chap05_practice.repository.HashTagRepository;
 import com.spring.jpa.chap05_practice.repository.PostRepository;
@@ -25,6 +22,7 @@ import java.util.stream.Collectors;
 @Transactional // JPA 레파지토리는 트랜잭션 단위로 동작하기 때문에 작성
 public class PostService {
 
+    // final / @Autowired
     private final PostRepository postRepository;
     private final HashTagRepository hashTagRepository;
 
@@ -33,6 +31,7 @@ public class PostService {
         //Pageable 객체 생성
         Pageable pageable = PageRequest.of(
                 dto.getPage() - 1,
+                // 0을 1페이지로 인식 -> -1
                 dto.getSize(),
                 Sort.by("createDate").descending()
         );
@@ -54,5 +53,17 @@ public class PostService {
                 .pageInfo(new PageResponseDTO(posts))   // 생성자에게 Page 정보가 담긴 객체를 그대로 전달
                 .posts(detailList)
                 .build();
+    }
+
+    public PostDetailResponseDTO getDetail(long id) {
+        Post postEntity = postRepository.findById(id)
+                .orElseThrow(
+                        () -> new RuntimeException(id + "번 게시물이 존재하지 않습니다.")
+                );
+        return new PostDetailResponseDTO(postEntity);
+    }
+
+    public PostDetailResponseDTO insert(PostCreateDTO dto) {
+        return null;
     }
 }
