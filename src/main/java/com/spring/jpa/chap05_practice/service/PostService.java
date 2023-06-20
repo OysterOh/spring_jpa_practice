@@ -1,6 +1,7 @@
 package com.spring.jpa.chap05_practice.service;
 
 import com.spring.jpa.chap05_practice.dto.*;
+import com.spring.jpa.chap05_practice.entity.HashTag;
 import com.spring.jpa.chap05_practice.entity.Post;
 import com.spring.jpa.chap05_practice.repository.HashTagRepository;
 import com.spring.jpa.chap05_practice.repository.PostRepository;
@@ -45,8 +46,8 @@ public class PostService {
         // 엔티티 객체를 DTO 객체로 변환한 결과 리스트
         List<PostDetailResponseDTO> detailList
                 = postList.stream()
-                        .map(post -> new PostDetailResponseDTO(post))
-                        .collect(Collectors.toList());
+                .map(post -> new PostDetailResponseDTO(post))
+                .collect(Collectors.toList());
         // DB 에서 조회한 정보(ENTITY)를 JSON 형태에 맞는 DTO 로 변환
         return PostListResponseDTO.builder()
                 .count(detailList.size()) // 총 게시물 수가 아니라 조회된 게시물 수
@@ -63,7 +64,32 @@ public class PostService {
         return new PostDetailResponseDTO(postEntity);
     }
 
-    public PostDetailResponseDTO insert(PostCreateDTO dto) {
-        return null;
+    public PostDetailResponseDTO insert(final PostCreateDTO dto)
+        throws RuntimeException {
+
+        // 게시물 저장
+        Post saved = postRepository.save(dto.toEntity());
+
+        // 해시태그 저장
+        List<String> hashTags = dto.getHashTags();
+        if (hashTags != null && hashTags.size() > 0) {
+            hashTags.forEach(ht -> {
+                HashTag savedTag = hashTagRepository.save(
+                        HashTag.builder()
+                                .tagName(ht)
+                                .post(saved)
+                                .build()
+                );
+                //Post Entity 는 DB에 save 를 진행할 때 HashTag 에 대한 내용을 갱신하지 않는다.
+                //HashTag Entity 는 따로 save 를 진행한다.
+                //HashTag 는 연관관계의 주인이기 때문에 save 를 진행할 때 Post 를 전달하기 때문에
+                //DB와 Entity 와의 상태가 동일하지만, POST 는 HashTag 의 정보가 비어있는 상태이다.
+                //Post Entity 에 연관관계 편의 메서드를 작성하여 HashTag 의 내용을 동기화 해야
+                //추후에 진행되는 과정에서 문제가 발생하지 않는다. (연관관계의 주인이 아니기 때문)
+                saved.addHashTag(savedTag);
+            });
+        }
+
+        return new PostDetailResponseDTO(saved);
     }
 }
