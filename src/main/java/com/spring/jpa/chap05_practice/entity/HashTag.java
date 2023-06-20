@@ -21,7 +21,8 @@ public class HashTag {
 
     private String tagName; //해시태그 이름
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+                                                // 부모 없어지면 자식도 같이 없어진다
     @JoinColumn(name = "post_no")
     private Post post;
 }
